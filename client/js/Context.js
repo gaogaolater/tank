@@ -25,8 +25,7 @@ var Context = {
         this.addTank(tank);
         this.initKeyEvent();
         this.status = "running";
-        setInterval(this.loop.bind(this), 20);
-        //this.loop();
+        this.loop();
     },
     stop: function () {
 
@@ -34,33 +33,23 @@ var Context = {
     pause: function () {
 
     },
-    keyMap: {
-        38: 'up',
-        40: 'down',
-        37: 'left',
-        39: 'right',
-        32: 'fire'
-    },
     loop: function () {
         var _this = this;
         if (this.status == 'running') {
             this.ctx.clearRect(0, 0, this.width, this.height);
-            //this.ctx.drawImage(GameMap.mapDom, 0, 0, this.width, this.width);
-            //if (this.commands.length > 0) {
-            //console.log('commands', this.commands);
+            this.ctx.drawImage(GameMap.mapDom, 0, 0, this.width, this.width);
             if (this.commands.length > 0) {
                 for (var i = 0; i < this.commands.length; i++) {
                     var command = this.commands[i];
                     if (this.checkKeyCode(command)) {
-                        console.log('command',command);
-                        this.tanks[0].execute(this.keyMap[command]);
+                        this.tanks[0].execute(command);
+                    }
+                    if (command == Keys.fire) {
+                        this.commands.remove(command);
                     }
                 }
             }
-
             this.tanks[0].update(this.ctx);
-            //}
-
             requestAnimationFrame(function () {
                 _this.loop();
             });
@@ -78,18 +67,13 @@ var Context = {
         document.onkeydown = function (event) {
             //上38 下40 左37 右39 空格32
             var keyCode = event.keyCode;
-            //console.log(keyCode);
             if (_this.checkKeyCode(keyCode)) {
-                _this.ctx.clearRect(0, 0, _this.width, _this.height);
-                //  _this.mainTank.execute(_this.keyMap[keyCode]);
-                //  _this.mainTank.update(_this.ctx);
-                _this.commands.push(keyCode);
+                _this.commands.addIfNotExist(keyCode);
             }
-            //tank.move();
         }
-        document.onkeyup = function () {
-            console.log('keyup',_this.commands);
-            _this.commands = [];
+        document.onkeyup = function (event) {
+            var keyCode = event.keyCode;
+            _this.commands.remove(keyCode);
         }
     },
     checkCrash: function (obj1, obj2) {

@@ -6,16 +6,16 @@ function Tank(x, y, type) {
     this.h = 28;
     this.health = 1;
     this.life = 1;
-    this.direction = 'up';
-    this.speed = 4;
+    this.direction = Keys.up;
+    this.speed = 1;
     this.picPositions = {
-        "up": [2, 0],
-        "down": [34, 0],
-        "left": [66, 2],
-        "right": [96, 2]
+        [Keys.up]: [2, 0],
+        [Keys.down]: [34, 0],
+        [Keys.left]: [66, 2],
+        [Keys.right]: [96, 2]
     };
     //在雪碧图中中的定位
-    this.picPosition = this.picPositions.up;
+    this.picPosition = this.picPositions[Keys.up];
     this.bullets = [];
 }
 
@@ -38,7 +38,7 @@ Tank.prototype._checkCrash = function (direction, nextPosition) {
         h: this.h
     }
     switch (this.direction) {
-        case "up":
+        case Keys.up:
             if (y <= 0) return true;
             wallMinX = Math.floor(x / GameMap.itemSize[0]);
             wallMaxX = Math.floor((x + this.w) / GameMap.itemSize[0]);
@@ -51,7 +51,7 @@ Tank.prototype._checkCrash = function (direction, nextPosition) {
                 }
             }
             return false;
-        case "down":
+        case Keys.down:
             if (y + this.h >= GameMap.h) return true;
             wallMinX = Math.floor(x / GameMap.itemSize[0]);
             wallMaxX = Math.floor((x + this.w) / GameMap.itemSize[0]);
@@ -64,7 +64,7 @@ Tank.prototype._checkCrash = function (direction, nextPosition) {
                 }
             }
             return false;
-        case "left":
+        case Keys.left:
             if (x <= 0) return true;
             wallMinY = Math.floor(y / GameMap.itemSize[1]);
             wallMaxY = Math.floor((y + this.h) / GameMap.itemSize[1]);
@@ -94,12 +94,10 @@ Tank.prototype._checkCrash = function (direction, nextPosition) {
 
 }
 
-
-
 Tank.prototype.execute = function (command) {
-    if (command == "up" || command == "down" || command == "left" || command == "right") {
+    if (Keys.isDirection(command)) {
         this.move(command);
-    } else if (command == "fire") {
+    } else if (command == Keys.fire) {
         this.fire();
     }
 }
@@ -126,13 +124,13 @@ Tank.prototype.update = function (ctx) {
 Tank.prototype._nextPosition = function (direction) {
     var x = this.x, y = this.y;
     switch (this.direction) {
-        case "up":
+        case Keys.up:
             y -= this.speed;
             break;
-        case "down":
+        case Keys.down:
             y += this.speed;
             break;
-        case "left":
+        case Keys.left:
             x -= this.speed;
             break;
         default:
@@ -146,13 +144,12 @@ Tank.prototype.move = function (direction) {
     if (this.direction != direction) {
         this.direction = direction;
         this.setDirection(direction)
-    } else {
-        //和墙壁、边缘的碰撞检测
-        var nextPosition = this._nextPosition(this.direction);
-        //if (this._checkCrash(this.direction, nextPosition) == false) {
-            this.x = nextPosition.x;
-            this.y = nextPosition.y;
-        //}
+    }
+    //和墙壁、边缘的碰撞检测
+    var nextPosition = this._nextPosition(this.direction);
+    if (this._checkCrash(this.direction, nextPosition) == false) {
+        this.x = nextPosition.x;
+        this.y = nextPosition.y;
     }
 }
 

@@ -21,19 +21,19 @@ Bullet.prototype._fixPosition = function () {
     this.move = null;
 
     switch (this.direction) {
-        case "up":
+        case Keys.up:
             this.x = this.tank.x + offset;
             this.y = this.tank.y;
             this.move = function () { this.y -= this.speed; }
             this.picPosition = [80, 96, 5, 6];
             break;
-        case "down":
+        case Keys.down:
             this.x = this.tank.x + offset;
             this.y = this.tank.y + this.tank.w;
             this.move = function () { this.y += this.speed; }
             this.picPosition = [86, 96, 5, 6];
             break;
-        case "left":
+        case Keys.left:
             this.x = this.tank.x;
             this.y = this.tank.y + offset;
             this.move = function () { this.x -= this.speed; }
