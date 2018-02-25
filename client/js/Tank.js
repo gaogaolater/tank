@@ -1,97 +1,25 @@
 //type 1普通黄 2普通绿 3普通白 4轻型坦克 5重型坦克 
-function Tank(x, y, type) {
+function Tank(x, y) {
     this.x = x;
     this.y = y;
-    this.w = 28;
-    this.h = 28;
+    this.w = 26;
+    this.h = 26;
     this.health = 1;
-    this.life = 1;
+    this.life = 2;
     this.direction = Keys.up;
     this.speed = 1;
-    this.picPositions = {
-        [Keys.up]: [2, 0],
-        [Keys.down]: [34, 0],
-        [Keys.left]: [66, 2],
-        [Keys.right]: [96, 2]
-    };
     //在雪碧图中中的定位
-    this.picPosition = this.picPositions[Keys.up];
+    this.picPositions = {
+        [Keys.up]: [3, 3],
+        [Keys.down]: [35, 3],
+        [Keys.left]: [68, 3],
+        [Keys.right]: [96, 3]
+    };
     this.bullets = [];
 }
 
 Tank.prototype.setDirection = function (direction) {
     this.picPosition = this.picPositions[direction];
-}
-
-//检查边缘碰撞和墙壁的碰撞
-Tank.prototype._checkCrash = function (direction, nextPosition) {
-    var wallMinX, wallMaxX, wallY, wallX, wallMinY, wallMaxY;
-    var maxX = GameMap.x;
-    var maxItemX = GameMap.itemCount[0];
-    var maxItemY = GameMap.itemCount[1];
-    var x = nextPosition.x;
-    var y = nextPosition.y;
-    var nextTankPosition = {
-        x: x,
-        y: y,
-        w: this.w,
-        h: this.h
-    }
-    switch (this.direction) {
-        case Keys.up:
-            if (y <= 0) return true;
-            wallMinX = Math.floor(x / GameMap.itemSize[0]);
-            wallMaxX = Math.floor((x + this.w) / GameMap.itemSize[0]);
-            wallY = Math.floor(y / GameMap.itemSize[1]);
-            for (var i = wallMinX; i <= wallMaxX; i++) {
-                var mapItem = GameMap.currentMap[wallY][i];
-                var mapType = mapItem.type;
-                if (mapType != 0) {
-                    return true;
-                }
-            }
-            return false;
-        case Keys.down:
-            if (y + this.h >= GameMap.h) return true;
-            wallMinX = Math.floor(x / GameMap.itemSize[0]);
-            wallMaxX = Math.floor((x + this.w) / GameMap.itemSize[0]);
-            wallY = Math.floor((y + this.h) / GameMap.itemSize[1]);
-            for (var i = wallMinX; i <= wallMaxX; i++) {
-                var mapItem = GameMap.currentMap[wallY][i];
-                var mapType = mapItem.type;
-                if (mapType != 0) {
-                    return true;
-                }
-            }
-            return false;
-        case Keys.left:
-            if (x <= 0) return true;
-            wallMinY = Math.floor(y / GameMap.itemSize[1]);
-            wallMaxY = Math.floor((y + this.h) / GameMap.itemSize[1]);
-            wallX = Math.floor(x / GameMap.itemSize[0]);
-            for (var i = wallMinY; i <= wallMaxY; i++) {
-                var mapItem = GameMap.currentMap[i][wallX];
-                var mapType = mapItem.type;
-                if (mapType != 0) {
-                    return true;
-                }
-            }
-            return false;
-        default:
-            if (x + this.w >= GameMap.w) return true;
-            wallMinY = Math.floor(y / GameMap.itemSize[1]);
-            wallMaxY = Math.floor((y + this.h) / GameMap.itemSize[1]);
-            wallX = Math.floor((x + this.w) / GameMap.itemSize[0]);
-            for (var i = wallMinY; i <= wallMaxY; i++) {
-                var mapItem = GameMap.currentMap[i][wallX];
-                var mapType = mapItem.type;
-                if (mapType != 0) {
-                    return true;
-                }
-            }
-            return false;
-    }
-
 }
 
 Tank.prototype.execute = function (command) {
@@ -104,8 +32,8 @@ Tank.prototype.execute = function (command) {
 
 Tank.prototype.update = function (ctx) {
     this.ctx = ctx;
-
-    ctx.drawImage(Resource.img, this.picPosition[0], this.picPosition[1], this.w, this.h, this.x, this.y, this.w, this.h);
+    var picPosition = this.picPositions[this.direction]
+    ctx.drawImage(Resource.img, picPosition[0], picPosition[1], this.w, this.h, this.x, this.y, this.w, this.h);
     if (Game.debug) {
         ctx.save();
         ctx.strokeStyle = "white";
@@ -121,7 +49,7 @@ Tank.prototype.update = function (ctx) {
     }
 }
 
-Tank.prototype._nextPosition = function (direction) {
+Tank.prototype.getNextPosition = function (direction) {
     var x = this.x, y = this.y;
     switch (this.direction) {
         case Keys.up:
@@ -165,3 +93,32 @@ Tank.prototype.destory = function () {
 
 }
 
+//重型坦克
+function TankWeight(x, y) {
+    Tank.call(this, x, y);
+    this.life = 4;
+    this.speed = 0.5;
+    this.w = 28;
+    this.h = 28;
+    this.picPositions = {
+        [Keys.up]: [3, 66],
+        [Keys.down]: [35, 66],
+        [Keys.left]: [66, 66],
+        [Keys.right]: [98, 66]
+    };
+}
+TankWeight.prototype = new Tank();
+
+//轻型坦克
+function TankLight(x, y) {
+    Tank.call(this, x, y);
+    this.life = 1;
+    this.speed = 1.5;
+    this.picPositions = {
+        [Keys.up]: [3, 35],
+        [Keys.down]: [35, 35],
+        [Keys.left]: [68, 35],
+        [Keys.right]: [96, 35]
+    };
+}
+TankLight.prototype = new Tank();

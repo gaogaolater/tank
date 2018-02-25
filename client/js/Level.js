@@ -1,18 +1,28 @@
-
 (function () {
-	GameMap = {
+	Level = {
 		currentMap: [],
 		changed: true,
 		ctx: null,
-		mapDom: null,
+		dom: null,
 		itemSize: [16, 16],//每个子项大小
 		itemCount: [26, 26],//地图包含的子项
-		drawLevel: function (level) {
+		maxEnemy: 20,
+		init: function (level) {
+			this.w = this.itemSize[0] * this.itemCount[0];
+			this.h = this.itemSize[1] * this.itemCount[1];
+			if (this.ctx == null) {
+				var canvas = Util.createCanvas(this.width, this.height, false);
+				this.ctx = canvas.ctx;
+				this.dom = canvas.dom;
+			}
+			this.drawMap(level || 1);
+		},
+		drawMap: function (level) {
 			if (level >= 1 && level <= 21) {
 				var map = eval('map' + level);
 				var w = this.itemSize[0], h = this.itemSize[1];
 				var mapCanvas = document.createElement("canvas");
-				this.mapDom = mapCanvas;
+				this.dom = mapCanvas;
 				mapCanvas.width = w * map1.length;
 				mapCanvas.height = h * map1.length;
 				var ctx = mapCanvas.getContext("2d");
@@ -27,14 +37,9 @@
 					}
 				}
 			}
-		},
-		drawObject: function (type, ctx) {
-
 		}
 	}
-	GameMap.w = GameMap.itemSize[0] * GameMap.itemCount[0];
-	GameMap.h = GameMap.itemSize[1] * GameMap.itemCount[1];
-
+	
 	var MapObj = function (w, h, x, y, type) {
 		this.x = x;
 		this.y = y;
