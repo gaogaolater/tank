@@ -6,7 +6,6 @@ function Bullet(tank) {
     this.y = null;
     this.width = null;
     this.height = null;
-    this.range = 200;//射程
     this.direction = tank.direction;
     this.speed = 4;
     this.picPosition = null;
@@ -48,12 +47,11 @@ Bullet.prototype._fixPosition = function () {
     }
 }
 
+Bullet.prototype.destroy = function (ctx) {
+
+}
+
 Bullet.prototype.update = function (ctx) {
     this.move();
     ctx.drawImage(Resource.img, this.picPosition[0], this.picPosition[1], this.picPosition[2], this.picPosition[3], this.x, this.y, this.picPosition[2], this.picPosition[3]);
-    if (Math.abs(this.startX - this.x) >= this.range || Math.abs(this.startY - this.y) >= this.range) {
-        return false;
-    } else {
-        return true;
-    }
 }

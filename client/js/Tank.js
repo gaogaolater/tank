@@ -1,13 +1,9 @@
 //type 1普通黄 2普通绿 3普通白 4轻型坦克 5重型坦克 
 function Tank(x, y) {
-    this.x = x;
-    this.y = y;
-    this.w = 26;
-    this.h = 26;
+    Mover.call(x, y, 26, 26, Keys.up, 1)
     this.health = 1;
     this.life = 2;
     this.direction = Keys.up;
-    this.speed = 1;
     //在雪碧图中中的定位
     this.picPositions = {
         [Keys.up]: [3, 3],
@@ -19,15 +15,10 @@ function Tank(x, y) {
 }
 
 Tank.prototype.setDirection = function (direction) {
-    this.picPosition = this.picPositions[direction];
-}
-
-Tank.prototype.execute = function (command) {
-    if (Keys.isDirection(command)) {
-        this.move(command);
-    } else if (command == Keys.fire) {
-        this.fire();
+    if (this.direction != direction) {
+        this.direction = direction;
     }
+    this.picPosition = this.picPositions[direction];
 }
 
 Tank.prototype.update = function (ctx) {
@@ -46,38 +37,6 @@ Tank.prototype.update = function (ctx) {
                 this.bullets.splice(i, 1);
             }
         }
-    }
-}
-
-Tank.prototype.getNextPosition = function (direction) {
-    var x = this.x, y = this.y;
-    switch (this.direction) {
-        case Keys.up:
-            y -= this.speed;
-            break;
-        case Keys.down:
-            y += this.speed;
-            break;
-        case Keys.left:
-            x -= this.speed;
-            break;
-        default:
-            x += this.speed;
-            break;
-    }
-    return { x: x, y: y }
-}
-
-Tank.prototype.move = function (direction) {
-    if (this.direction != direction) {
-        this.direction = direction;
-        this.setDirection(direction)
-    }
-    //和墙壁、边缘的碰撞检测
-    var nextPosition = this._nextPosition(this.direction);
-    if (this._checkCrash(this.direction, nextPosition) == false) {
-        this.x = nextPosition.x;
-        this.y = nextPosition.y;
     }
 }
 
@@ -107,6 +66,7 @@ function TankWeight(x, y) {
         [Keys.right]: [98, 66]
     };
 }
+
 TankWeight.prototype = new Tank();
 
 //轻型坦克
