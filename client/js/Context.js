@@ -26,10 +26,16 @@ var Context = {
     },
     //子弹碰撞检测
     bulletCollision: function () {
+        var _this = this;
         //主体坦克子弹碰撞
         this.mainTank.bullets.forEach(function (bullet) {
             //判断是否击中地图对象或超出边缘
-
+            var collision = _this.checkWallCollision(bullet);
+            if (collision.type == CollisionType.no) {
+                bullet.update(_this.ctx);
+            } else {
+                bullet.destroy();
+            }
             //判断是否击中地图敌方坦克
 
             //判断是否击中敌方坦克子弹            
@@ -51,11 +57,14 @@ var Context = {
                 if (Keys.isDirection(command)) {
                     mainTank.setDirection(command);
                     var nextPosition = mainTank.getNextPosition();
-                    if(this.checkWallCollision(nextPosition) == false){
+                    var collision = this.checkWallCollision(nextPosition);
+                    console.log(collision);
+                    if (collision.type == CollisionType.no) {
                         this.mainTank.move(command);
                     }
                 } else if (Keys.isFire(command)) {
                     this.mainTank.fire();
+                    //需要立即移除
                     this.commands.remove(command);
                 }
             }
@@ -72,6 +81,7 @@ var Context = {
 
             //更新视图
             this.ctx.drawImage(Level.dom, 0, 0, this.width, this.height);
+
             this.mainTank.update(this.ctx);
             requestAnimationFrame(function () {
                 _this.loop();
@@ -100,57 +110,49 @@ var Context = {
         var x = obj.x, y = obj.y, w = obj.w, h = obj.h;
         switch (obj.direction) {
             case Keys.up:
-                if (y <= 0) return true;
+                if (y <= 0) return { type: CollisionType.edge };
                 wallMinX = Math.floor(x / Level.itemSize[0]);
                 wallMaxX = Math.floor((x + w) / Level.itemSize[0]);
                 wallY = Math.floor(y / Level.itemSize[1]);
                 for (var i = wallMinX; i <= wallMaxX; i++) {
-                    var mapItem = Level.currentMap[wallY][i];
-                    var mapType = mapItem.type;
-                    if (mapType != 0) {
-                        return true;
+                    if (Level.currentMap[wallY][i] != 0) {
+                        return { type: CollisionType.wall, x: i, y: wallY };
                     }
                 }
-                return false;
+                return { type: CollisionType.no };
             case Keys.down:
-                if (y + h >= Level.h) return true;
+                if (y + h >= Level.h) return { type: CollisionType.edge };
                 wallMinX = Math.floor(x / Level.itemSize[0]);
                 wallMaxX = Math.floor((x + w) / Level.itemSize[0]);
                 wallY = Math.floor((y + h) / Level.itemSize[1]);
                 for (var i = wallMinX; i <= wallMaxX; i++) {
-                    var mapItem = Level.currentMap[wallY][i];
-                    var mapType = mapItem.type;
-                    if (mapType != 0) {
-                        return true;
+                    if (Level.currentMap[wallY][i] != 0) {
+                        return { type: CollisionType.wall, x: i, y: wallY };
                     }
                 }
-                return false;
+                return { type: CollisionType.no };
             case Keys.left:
-                if (x <= 0) return true;
+                if (x <= 0) return { type: CollisionType.edge };
                 wallMinY = Math.floor(y / Level.itemSize[1]);
                 wallMaxY = Math.floor((y + h) / Level.itemSize[1]);
                 wallX = Math.floor(x / Level.itemSize[0]);
                 for (var i = wallMinY; i <= wallMaxY; i++) {
-                    var mapItem = Level.currentMap[i][wallX];
-                    var mapType = mapItem.type;
-                    if (mapType != 0) {
-                        return true;
+                    if (Level.currentMap[i][wallX] != 0) {
+                        return { type: CollisionType.wall, x: wallX, y: i };
                     }
                 }
-                return false;
+                return { type: CollisionType.no };
             default:
-                if (x + w >= Level.w) return true;
+                if (x + w >= Level.w) return { type: CollisionType.edge };
                 wallMinY = Math.floor(y / Level.itemSize[1]);
                 wallMaxY = Math.floor((y + h) / Level.itemSize[1]);
                 wallX = Math.floor((x + w) / Level.itemSize[0]);
                 for (var i = wallMinY; i <= wallMaxY; i++) {
-                    var mapItem = Level.currentMap[i][wallX];
-                    var mapType = mapItem.type;
-                    if (mapType != 0) {
-                        return true;
+                    if (Level.currentMap[i][wallX] != 0) {
+                        return { type: CollisionType.wall, x: wallX, y: i };
                     }
                 }
-                return false;
+                return { type: CollisionType.no };
         }
     }
 }

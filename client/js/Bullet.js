@@ -1,13 +1,9 @@
 function Bullet(tank) {
+    Mover.call(this, tank.x, tank.y, 5, 5, tank.direction, 4);
     this.tank = tank;
-    this.startX = null;
-    this.startY = null;
-    this.x = null;
-    this.y = null;
-    this.width = null;
-    this.height = null;
+    this.w = 5;
+    this.y = 5;
     this.direction = tank.direction;
-    this.speed = 4;
     this.picPosition = null;
     this._fixPosition();
     this.startX = this.x;
@@ -18,7 +14,6 @@ function Bullet(tank) {
 Bullet.prototype._fixPosition = function () {
     var offset = parseInt(this.tank.w / 2) - 2;
     this.move = null;
-
     switch (this.direction) {
         case Keys.up:
             this.x = this.tank.x + offset;

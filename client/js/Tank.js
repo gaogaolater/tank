@@ -16,32 +16,6 @@ function Tank(x, y) {
 
 Tank.prototype = new Mover();
 
-Tank.prototype.setDirection = function (direction) {
-    if (this.direction != direction) {
-        this.direction = direction;
-    }
-    this.picPosition = this.picPositions[direction];
-}
-
-Tank.prototype.update = function (ctx) {
-    this.ctx = ctx;
-    var picPosition = this.picPositions[this.direction]
-    ctx.drawImage(Resource.img, picPosition[0], picPosition[1], this.w, this.h, this.x, this.y, this.w, this.h);
-    if (Game.debug) {
-        ctx.save();
-        ctx.strokeStyle = "white";
-        ctx.strokeRect(this.x, this.y, this.w, this.h);
-        ctx.restore();
-    }
-    // if (this.bullets.length > 0) {
-    //     for (var i = 0; i < this.bullets.length; i++) {
-    //         if (this.bullets[i].update(ctx) == false) {
-    //             this.bullets.splice(i, 1);
-    //         }
-    //     }
-    // }
-}
-
 Tank.prototype.fire = function () {
     this.bullets.push(new Bullet(this));
 }

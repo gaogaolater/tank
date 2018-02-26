@@ -11,12 +11,32 @@ var Mover = function (x, y, w, h, direction, speed) {
     this.speed = speed;
     this.nextX = 0;
     this.nextY = 0;
+    //在雪碧图中中的定位
+    // this.picPositions = {};
+}
+
+Mover.prototype.setDirection = function (direction) {
+    if (this.direction != direction) {
+        this.direction = direction;
+    }
+    this.picPosition = this.picPositions[direction];
 }
 
 Mover.prototype.move = function () {
     var next = this.getNextPosition();
     this.x = next.x;
     this.y = next.y;
+}
+
+Mover.prototype.update = function (ctx) {
+    var picPosition = this.picPositions[this.direction]
+    ctx.drawImage(Resource.img, picPosition[0], picPosition[1], this.w, this.h, this.x, this.y, this.w, this.h);
+    if (Game.debug) {
+        ctx.save();
+        ctx.strokeStyle = "white";
+        ctx.strokeRect(this.x, this.y, this.w, this.h);
+        ctx.restore();
+    }
 }
 
 Mover.prototype.getNextPosition = function () {

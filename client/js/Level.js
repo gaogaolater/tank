@@ -1,6 +1,7 @@
 (function () {
 	Level = {
 		currentMap: [],
+		currentLevel: 1,
 		changed: true,
 		ctx: null,
 		dom: null,
@@ -10,67 +11,57 @@
 		init: function (level) {
 			this.w = this.itemSize[0] * this.itemCount[0];
 			this.h = this.itemSize[1] * this.itemCount[1];
+			this.currentLevel = (level || 1);
+			this.currentMap = eval('map' + this.currentLevel);
 			if (this.ctx == null) {
-				var canvas = Util.createCanvas(this.width, this.height, false);
+				var canvas = Util.createCanvas(this.w, this.h, false);
 				this.ctx = canvas.ctx;
 				this.dom = canvas.dom;
 			}
-			this.drawMap(level || 1);
+			this.update();
 		},
-		drawMap: function (level) {
+		update: function () {
+			var level = this.currentLevel;
 			if (level >= 1 && level <= 21) {
-				var map = eval('map' + level);
-				var w = this.itemSize[0], h = this.itemSize[1];
-				var mapCanvas = document.createElement("canvas");
-				this.dom = mapCanvas;
-				mapCanvas.width = w * map1.length;
-				mapCanvas.height = h * map1.length;
-				var ctx = mapCanvas.getContext("2d");
-				this.ctx = ctx;
-				ctx.fillRect(0, 0, mapCanvas.width, mapCanvas.height);
-				this.currentMap = eval('map' + level);
+				var map = this.currentMap;
+				this.ctx.fillRect(0, 0, this.w, this.h);
 				for (var i = 0; i < map.length; i++) {
 					for (var j = 0; j < map[i].length; j++) {
-						var mapObj = new MapObj(w, h, j * w, i * h, map[i][j]);
-						mapObj.draw(ctx);
-						this.currentMap[i][j] = mapObj;
+						this.drawMap(j, i, map[i][j]);
 					}
 				}
 			}
+		},
+		drawMap: function (x, y, type) {
+			var w = this.itemSize[0];
+			var h = this.itemSize[1];
+			var offsetX = x * w;
+			var offsetY = y * h;
+			var ctx = this.ctx;
+			console.log(type);
+			if (type == 1) {
+				ctx.drawImage(Resource.img, 0, 96, 16, 16, offsetX, offsetY, w, h);
+			} else if (type == 2) {
+				ctx.drawImage(Resource.img, 16, 96, 16, 16, offsetX, offsetY, w, h);
+			} else if (type == 3) {
+				ctx.drawImage(Resource.img, 16, 96, 16, 16, offsetX, offsetY, w, h);
+			} else if (type == 4) {
+				ctx.drawImage(Resource.img, 32, 96, 16, 16, offsetX, offsetY, w, h);
+			} else if (type == 5) {
+				ctx.drawImage(Resource.img, 48, 96, 16, 16, offsetX, offsetY, w, h);
+			} else if (type == 9) {
+				ctx.drawImage(Resource.img, 32 * 8, 0, 32, 32, offsetX, offsetY, 32, 32);
+			}
+			if (Game.debug) {
+				ctx.save();
+				ctx.strokeStyle = "red";
+				ctx.strokeRect(offsetX, offsetY, 16, 16);
+				ctx.restore();
+			}
 		}
-	}
-	
-	var MapObj = function (w, h, x, y, type) {
-		this.x = x;
-		this.y = y;
-		this.w = w;
-		this.h = h;
-		this.type = type;
 	}
 
-	MapObj.prototype.draw = function (ctx) {
-		var type = this.type;
-		var l, t;
-		if (type == 1) {
-			ctx.drawImage(Resource.img, 0, 96, 16, 16, this.x, this.y, this.w, this.h);
-		} else if (type == 2) {
-			ctx.drawImage(Resource.img, 16, 96, 16, 16, this.x, this.y, this.w, this.h);
-		} else if (type == 3) {
-			ctx.drawImage(Resource.img, 16, 96, 16, 16, this.x, this.y, this.w, this.h);
-		} else if (type == 4) {
-			ctx.drawImage(Resource.img, 32, 96, 16, 16, this.x, this.y, this.w, this.h);
-		} else if (type == 5) {
-			ctx.drawImage(Resource.img, 48, 96, 16, 16, this.x, this.y, this.w, this.h);
-		} else if (type == 9) {
-			ctx.drawImage(Resource.img, 32 * 8, 0, 32, 32, this.x, this.y, 32, 32);
-		}
-		if (Game.debug) {
-			ctx.save();
-			ctx.strokeStyle = "red";
-			ctx.strokeRect(this.x, this.y, 16, 16);
-			ctx.restore();
-		}
-	}
+
 
 	/**
 	 * 地图数组
