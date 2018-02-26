@@ -47,9 +47,11 @@ var Context = {
         if (this.commands.length > 0) {
             for (var i = 0; i < this.commands.length; i++) {
                 var command = this.commands[i];
+                var mainTank = this.mainTank;
                 if (Keys.isDirection(command)) {
-                    this.mainTank.setDirection(command);
-                    if (this.checkWallCollision(this.mainTank) == false) {
+                    mainTank.setDirection(command);
+                    var nextPosition = mainTank.getNextPosition();
+                    if(this.checkWallCollision(nextPosition) == false){
                         this.mainTank.move(command);
                     }
                 } else if (Keys.isFire(command)) {
@@ -58,16 +60,19 @@ var Context = {
                 }
             }
         }
-        this.mainTank.update(this.ctx);
     },
     loop: function () {
         var _this = this;
         if (this.status == 'running') {
             this.ctx.clearRect(0, 0, this.width, this.height);
-            this.ctx.drawImage(Level.dom, 0, 0, this.width, this.height);
+            //业务处理
             this.excuteCommand();
             this.addEnemy();
             this.bulletCollision();
+
+            //更新视图
+            this.ctx.drawImage(Level.dom, 0, 0, this.width, this.height);
+            this.mainTank.update(this.ctx);
             requestAnimationFrame(function () {
                 _this.loop();
             });
@@ -89,5 +94,63 @@ var Context = {
             _this.commands.remove(keyCode);
         }
     },
-    
+    //检查边缘碰撞和墙壁的碰撞
+    checkWallCollision: function (obj) {
+        var wallMinX, wallMaxX, wallY, wallX, wallMinY, wallMaxY;
+        var x = obj.x, y = obj.y, w = obj.w, h = obj.h;
+        switch (obj.direction) {
+            case Keys.up:
+                if (y <= 0) return true;
+                wallMinX = Math.floor(x / Level.itemSize[0]);
+                wallMaxX = Math.floor((x + w) / Level.itemSize[0]);
+                wallY = Math.floor(y / Level.itemSize[1]);
+                for (var i = wallMinX; i <= wallMaxX; i++) {
+                    var mapItem = Level.currentMap[wallY][i];
+                    var mapType = mapItem.type;
+                    if (mapType != 0) {
+                        return true;
+                    }
+                }
+                return false;
+            case Keys.down:
+                if (y + h >= Level.h) return true;
+                wallMinX = Math.floor(x / Level.itemSize[0]);
+                wallMaxX = Math.floor((x + w) / Level.itemSize[0]);
+                wallY = Math.floor((y + h) / Level.itemSize[1]);
+                for (var i = wallMinX; i <= wallMaxX; i++) {
+                    var mapItem = Level.currentMap[wallY][i];
+                    var mapType = mapItem.type;
+                    if (mapType != 0) {
+                        return true;
+                    }
+                }
+                return false;
+            case Keys.left:
+                if (x <= 0) return true;
+                wallMinY = Math.floor(y / Level.itemSize[1]);
+                wallMaxY = Math.floor((y + h) / Level.itemSize[1]);
+                wallX = Math.floor(x / Level.itemSize[0]);
+                for (var i = wallMinY; i <= wallMaxY; i++) {
+                    var mapItem = Level.currentMap[i][wallX];
+                    var mapType = mapItem.type;
+                    if (mapType != 0) {
+                        return true;
+                    }
+                }
+                return false;
+            default:
+                if (x + w >= Level.w) return true;
+                wallMinY = Math.floor(y / Level.itemSize[1]);
+                wallMaxY = Math.floor((y + h) / Level.itemSize[1]);
+                wallX = Math.floor((x + w) / Level.itemSize[0]);
+                for (var i = wallMinY; i <= wallMaxY; i++) {
+                    var mapItem = Level.currentMap[i][wallX];
+                    var mapType = mapItem.type;
+                    if (mapType != 0) {
+                        return true;
+                    }
+                }
+                return false;
+        }
+    }
 }

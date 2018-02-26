@@ -1,6 +1,6 @@
 //type 1普通黄 2普通绿 3普通白 4轻型坦克 5重型坦克 
 function Tank(x, y) {
-    Mover.call(x, y, 26, 26, Keys.up, 1)
+    Mover.call(this, x, y, 26, 26, Keys.up, 1)
     this.health = 1;
     this.life = 2;
     this.direction = Keys.up;
@@ -13,6 +13,8 @@ function Tank(x, y) {
     };
     this.bullets = [];
 }
+
+Tank.prototype = new Mover();
 
 Tank.prototype.setDirection = function (direction) {
     if (this.direction != direction) {
@@ -31,13 +33,13 @@ Tank.prototype.update = function (ctx) {
         ctx.strokeRect(this.x, this.y, this.w, this.h);
         ctx.restore();
     }
-    if (this.bullets.length > 0) {
-        for (var i = 0; i < this.bullets.length; i++) {
-            if (this.bullets[i].update(ctx) == false) {
-                this.bullets.splice(i, 1);
-            }
-        }
-    }
+    // if (this.bullets.length > 0) {
+    //     for (var i = 0; i < this.bullets.length; i++) {
+    //         if (this.bullets[i].update(ctx) == false) {
+    //             this.bullets.splice(i, 1);
+    //         }
+    //     }
+    // }
 }
 
 Tank.prototype.fire = function () {
