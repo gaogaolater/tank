@@ -8,6 +8,7 @@ var Context = {
     enemy: [],//敌军坦克
     lastEnumyCount: Level.maxEnemy,//剩余敌军坦克
     commands: [],
+    loopEvent: [],//轮询事件
     initMainCanvas: function () {
         var canvas = Util.createCanvas(this.width, this.height, true);
         this.ctx = canvas.ctx;
@@ -15,7 +16,7 @@ var Context = {
     init: function () {
         Level.init();
         this.initMainCanvas();
-        this.mainTank = new Tank(1, 2);
+        this.mainTank = new Tank(1, 2, this.ctx);
         this.initKeyEvent();
         this.status = "running";
         this.loop();
@@ -34,8 +35,10 @@ var Context = {
             if (collision.type == CollisionType.no) {
                 bullet.move();
                 bullet.update(_this.ctx);
-            } else {
-                console.log('destory');
+            } else if (collision.type == CollisionType.wall) {
+                Level.hitMap(collision.x,collision.y);
+                bullet.destroy();
+            } else if (collision.type == CollisionType.edge) {
                 bullet.destroy();
             }
             //判断是否击中地图敌方坦克
@@ -84,6 +87,10 @@ var Context = {
             this.bulletCollision();
             //更新视图
             this.mainTank.update(this.ctx);
+            if (this.loopEvent.length > 0) {
+                var event = this.loopEvent.pop();
+                event();
+            }
             requestAnimationFrame(function () {
                 _this.loop();
             });

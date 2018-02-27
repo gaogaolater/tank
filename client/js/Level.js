@@ -20,7 +20,16 @@
 			}
 			this.update();
 		},
-		update: function () {
+		//击中地图
+		hitMap: function (x, y) {
+			if (this.currentMap[y][x] == 1) {
+				this.currentMap[y][x] = 0;
+				console.log('击中', x, y);
+				var w = this.itemSize[0], h = this.itemSize[1];
+				this.ctx.fillRect(x * w, y * h, w, h);
+			}
+		},
+		update: function (x, y) {
 			var level = this.currentLevel;
 			if (level >= 1 && level <= 21) {
 				var map = this.currentMap;

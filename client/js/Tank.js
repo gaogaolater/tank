@@ -1,6 +1,6 @@
 //type 1普通黄 2普通绿 3普通白 4轻型坦克 5重型坦克 
-function Tank(x, y) {
-    Mover.call(this, x, y, 26, 26, Keys.up, 1)
+function Tank(x, y, ctx) {
+    Mover.call(this, x, y, 26, 26, Keys.up, 1, ctx)
     this.health = 1;
     this.life = 2;
     this.direction = Keys.up;

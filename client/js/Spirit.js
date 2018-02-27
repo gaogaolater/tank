@@ -5,6 +5,23 @@ var Spirit = function (x, y, w, h) {
     this.h = h;
 }
 
+Spirit.prototype.animate = function (frames) {
+    var index = 0;
+    if (frames.length == 0) return;
+    var _this = this;
+    var timer = setInterval(function () {
+        var frame = frames[index];
+        var x = frame[0], y = frame[1], w = frame[2], h = frame[3];
+        Context.loopEvent.push(function () {
+            Context.ctx.drawImage(Resource.img, x, y, w, h, _this.x, _this.y, w, h);
+        });
+        index++;
+        if (index == frames.length) {
+            clearInterval(timer);
+        }
+    }, 80);
+}
+
 var Mover = function (x, y, w, h, direction, speed) {
     Spirit.call(this, x, y, w, h);
     this.direction = direction;
@@ -14,6 +31,7 @@ var Mover = function (x, y, w, h, direction, speed) {
     //在雪碧图中中的定位
     // this.picPositions = {};
 }
+Mover.prototype = new Spirit();
 
 Mover.prototype.setDirection = function (direction) {
     if (this.direction != direction) {
@@ -29,6 +47,7 @@ Mover.prototype.move = function () {
 }
 
 Mover.prototype.update = function (ctx) {
+    this.ctx = ctx;
     var picPosition = this.picPositions[this.direction]
     ctx.drawImage(Resource.img, picPosition[0], picPosition[1], this.w, this.h, this.x, this.y, this.w, this.h);
     if (Game.debug) {
