@@ -32,8 +32,10 @@ var Context = {
             //判断是否击中地图对象或超出边缘
             var collision = _this.checkWallCollision(bullet);
             if (collision.type == CollisionType.no) {
+                bullet.move();
                 bullet.update(_this.ctx);
             } else {
+                console.log('destory');
                 bullet.destroy();
             }
             //判断是否击中地图敌方坦克
@@ -73,15 +75,14 @@ var Context = {
     loop: function () {
         var _this = this;
         if (this.status == 'running') {
+            //注意画图顺序
             this.ctx.clearRect(0, 0, this.width, this.height);
+            this.ctx.drawImage(Level.dom, 0, 0, this.width, this.height);
             //业务处理
             this.excuteCommand();
             this.addEnemy();
             this.bulletCollision();
-
             //更新视图
-            this.ctx.drawImage(Level.dom, 0, 0, this.width, this.height);
-
             this.mainTank.update(this.ctx);
             requestAnimationFrame(function () {
                 _this.loop();

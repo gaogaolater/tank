@@ -5,6 +5,7 @@ var Game = {
         });
     },
     pause: function () {
+        
     },
     reset: function () {
 
