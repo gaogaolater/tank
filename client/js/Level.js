@@ -7,7 +7,18 @@
 		dom: null,
 		itemSize: [16, 16],//每个子项大小
 		itemCount: [26, 26],//地图包含的子项
-		maxEnemy: 20,
+		enemyCount: 20,
+		maxAppearEnemy: 5,
+		//敌军老家 x轴的值
+		enemyHome: [
+			[2, 0],
+			[388, 0],
+			[195, 0]
+		],
+		mainHome: [
+			[9 * 16, 16 * 24],
+			[15 * 16 + 4, 16 * 24],
+		],
 		init: function (level) {
 			this.w = this.itemSize[0] * this.itemCount[0];
 			this.h = this.itemSize[1] * this.itemCount[1];

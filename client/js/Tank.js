@@ -1,6 +1,6 @@
 //type 1普通黄 2普通绿 3普通白 4轻型坦克 5重型坦克 
-function Tank(x, y, ctx) {
-    Mover.call(this, x, y, 26, 26, Keys.up, 1, ctx)
+function Tank(x, y) {
+    Mover.call(this, x, y, 26, 26, Keys.up, 1)
     this.health = 1;
     this.life = 2;
     this.direction = Keys.up;
@@ -20,10 +20,6 @@ Tank.prototype.fire = function () {
     this.bullets.push(new Bullet(this));
 }
 
-Tank.prototype.hited = function () {
-
-}
-
 Tank.prototype.destory = function () {
 
 }
@@ -35,15 +31,49 @@ function TankWeight(x, y) {
     this.speed = 0.5;
     this.w = 28;
     this.h = 28;
+    this.direction = Keys.down;
     this.picPositions = {
         [Keys.up]: [3, 66],
         [Keys.down]: [35, 66],
         [Keys.left]: [66, 66],
         [Keys.right]: [98, 66]
     };
+    this.AI();
 }
 
 TankWeight.prototype = new Tank();
+
+TankWeight.prototype.destory = function () {
+
+}
+
+TankWeight.prototype.AI = function () {
+    var _this = this;
+    // this.timer = setInterval(function () {
+    //     var random = parseInt(Math.random() * 10) % 5;
+    //     switch (random) {
+    //         case 0:
+    //             _this.setDirection(Keys.up);
+    //             _this.move();
+    //             break;
+    //         case 1:
+    //             _this.setDirection(Keys.down);
+    //             _this.move();
+    //             break;
+    //         case 2:
+    //             _this.setDirection(Keys.left);
+    //             _this.move();
+    //             break;
+    //         case 3:
+    //             _this.setDirection(Keys.right);
+    //             _this.move();
+    //             break;
+    //         default:
+    //             _this.fire();
+    //             break;
+    //     }
+    // }, 20);
+}
 
 //轻型坦克
 function TankLight(x, y) {

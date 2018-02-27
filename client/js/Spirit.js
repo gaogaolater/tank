@@ -46,8 +46,8 @@ Mover.prototype.move = function () {
     this.y = next.y;
 }
 
-Mover.prototype.update = function (ctx) {
-    this.ctx = ctx;
+Mover.prototype.update = function () {
+    var ctx = Context.ctx;
     var picPosition = this.picPositions[this.direction]
     ctx.drawImage(Resource.img, picPosition[0], picPosition[1], this.w, this.h, this.x, this.y, this.w, this.h);
     if (Game.debug) {

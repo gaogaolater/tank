@@ -71,7 +71,6 @@ Bullet.prototype.bomb = function () {
     this.animate(this.bombFrames);
 }
 
-Bullet.prototype.update = function (ctx) {
-    this.ctx = ctx;
-    ctx.drawImage(Resource.img, this.picPosition[0], this.picPosition[1], this.picPosition[2], this.picPosition[3], this.x, this.y, this.picPosition[2], this.picPosition[3]);
+Bullet.prototype.update = function () {
+    Context.ctx.drawImage(Resource.img, this.picPosition[0], this.picPosition[1], this.picPosition[2], this.picPosition[3], this.x, this.y, this.picPosition[2], this.picPosition[3]);
 }

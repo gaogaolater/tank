@@ -1,55 +1,81 @@
 var Context = {
-    level: 1,
-    status: 'stop',//stop pause running
-    mainTank: null,
     width: 416,
     height: 416,
-    ctx: null,
-    enemy: [],//敌军坦克
-    lastEnumyCount: Level.maxEnemy,//剩余敌军坦克
-    commands: [],
-    loopEvent: [],//轮询事件
-    initMainCanvas: function () {
-        var canvas = Util.createCanvas(this.width, this.height, true);
-        this.ctx = canvas.ctx;
-    },
-    init: function () {
-        Level.init();
-        this.initMainCanvas();
-        this.mainTank = new Tank(1, 2, this.ctx);
+    init: function (level) {
+        level = (level || 1);
+        this.commands = [];
+        this.level = level;
+        this.loopEvent = [];
+        this.lastEnumyCount = Level.maxEnemy;
+        Level.init(level);
+        this.enemy = [];
+        if (!this.ctx) {
+            this.ctx = Util.createCanvas(this.width, this.height, true).ctx;
+        }
+        var mainHome = Level.mainHome[0];
+        this.mainTank = new Tank(mainHome[0], mainHome[1]);
         this.initKeyEvent();
         this.status = "running";
         this.loop();
     },
     addEnemy: function () {
         //添加敌人
-
+        if (this.enemy.length < Level.maxAppearEnemy) {
+            //随机一个老家出现
+            var home = Level.enemyHome[parseInt(Math.random() * 10) % Level.enemyHome.length];
+            this.enemy.push(new TankWeight(home[0], home[1]));
+        }
+    },
+    removeEnemy: function (enemy) {
+        this.enemy.remove(enemy);
+        Level.enemyCount--;
+        if (Level.enemyCount == 0) {
+            if (this.level < 21) {
+                Level.init(++this.level);
+            } else {
+                alert("通关了");
+            }
+        }
+    },
+    //判断是否击中地图对象或超出边缘
+    bulletWallCollision: function (bullet) {
+        var wallCollision = this.checkWallCollision(bullet);
+        if (wallCollision.type == CollisionType.no) {
+            bullet.move();
+            bullet.update();
+        } else if (wallCollision.type == CollisionType.wall) {
+            Level.hitMap(wallCollision.x, wallCollision.y);
+            bullet.destroy();
+        } else if (wallCollision.type == CollisionType.edge) {
+            bullet.destroy();
+        }
     },
     //子弹碰撞检测
     bulletCollision: function () {
         var _this = this;
+        var enemys = this.enemy;
         //主体坦克子弹碰撞
         this.mainTank.bullets.forEach(function (bullet) {
-            //判断是否击中地图对象或超出边缘
-            var collision = _this.checkWallCollision(bullet);
-            if (collision.type == CollisionType.no) {
-                bullet.move();
-                bullet.update(_this.ctx);
-            } else if (collision.type == CollisionType.wall) {
-                Level.hitMap(collision.x,collision.y);
-                bullet.destroy();
-            } else if (collision.type == CollisionType.edge) {
-                bullet.destroy();
-            }
+            _this.bulletWallCollision(bullet);
             //判断是否击中地图敌方坦克
-
-            //判断是否击中敌方坦克子弹            
-
+            if (enemys.length > 0) {
+                enemys.forEach(function (enemy) {
+                    if (Util.checkCollision(enemy, bullet)) {
+                        enemy.destroy();
+                        _this.remove(enemy);
+                        //减掉敌军坦克数量，判断是否最后一个
+                        bullet.destroy();
+                    }
+                });
+            }
         })
         //敌军子弹碰撞
-        if (this.enemy.length > 0) {
+        if (this.enemy.length > 0 && this.enemy.bullets) {
             this.enemy.bullets.forEach(function (bullet) {
-
+                _this.bulletWallCollision(bullet);
+                if (Util.checkCollision(_this.mainTank, bullet)) {
+                    alert('你被击中了');
+                }
             })
         }
     },
@@ -86,10 +112,12 @@ var Context = {
             this.addEnemy();
             this.bulletCollision();
             //更新视图
-            this.mainTank.update(this.ctx);
+            this.mainTank.update();
+            this.enemy.forEach(function (enemy) {
+                enemy.update();
+            })
             if (this.loopEvent.length > 0) {
-                var event = this.loopEvent.pop();
-                event();
+                this.loopEvent.pop()();
             }
             requestAnimationFrame(function () {
                 _this.loop();
