@@ -16,11 +16,13 @@ var Context = {
         this.mainTank = new Tank(mainHome[0], mainHome[1]);
         this.initKeyEvent();
         this.status = "running";
-        this.loop();
+        this.loopId = this.loop();
+        this.remainEnemy = Level.enemyCount;
     },
     addEnemy: function () {
         //添加敌人
-        if (this.enemy.length < Level.maxAppearEnemy) {
+        if (this.remainEnemy > 0 && this.enemy.length < Level.maxAppearEnemy) {
+            this.remainEnemy--;
             //随机一个老家出现
             var home = Level.enemyHome[parseInt(Math.random() * 10) % Level.enemyHome.length];
             this.enemy.push(new TankWeight(home[0], home[1]));
@@ -28,13 +30,9 @@ var Context = {
     },
     removeEnemy: function (enemy) {
         this.enemy.remove(enemy);
-        Level.enemyCount--;
-        if (Level.enemyCount == 0) {
-            if (this.level < 21) {
-                Level.init(++this.level);
-            } else {
-                alert("通关了");
-            }
+        enemy.destroy();
+        if (this.remainEnemy == 0 && this.enemy.length == 0) {
+            this.nextLevel();
         }
     },
     //判断是否击中地图对象或超出边缘
@@ -61,10 +59,8 @@ var Context = {
             if (enemys.length > 0) {
                 enemys.forEach(function (enemy) {
                     if (Util.checkCollision(enemy, bullet)) {
-                        enemy.destroy();
-                        _this.enemy.remove(enemy);
-                        //减掉敌军坦克数量，判断是否最后一个
                         bullet.destroy();
+                        _this.removeEnemy(enemy);
                     }
                 });
             }
@@ -75,12 +71,20 @@ var Context = {
                 enemy.bullets.forEach(function (bullet) {
                     _this.bulletWallCollision(bullet);
                     if (Util.checkCollision(_this.mainTank, bullet)) {
-                        alert('你被击中了');
-                        _this.init();
+                        _this.gameOver();
                     }
                 })
             })
         }
+    },
+    gameOver: function () {
+        this.pause(function () {
+            var _this = this;
+            cancelAnimationFrame(this.loopId);
+            if (confirm("你被击中了，要重新来么？")) {
+                _this.init();
+            }
+        });
     },
     //执行命令
     excuteCommand: function () {
@@ -112,6 +116,34 @@ var Context = {
             enemy.update();
         });
     },
+    pause: function (callback) {
+        this.status = 'pause';
+        if (callback)
+            setTimeout(callback.bind(this), 20);
+    },
+    nextLevel: function () {
+        var _this = this;
+        cancelAnimationFrame(this.loopId);
+        this.pause(function () {
+            if (this.level < 21) {
+                //下一关卡
+                ++_this.level
+                var ctx = this.ctx;
+                ctx.save();
+                ctx.fillStyle = "gray";
+                ctx.clearRect(0, 0, this.width, this.height);
+                ctx.fillRect(0, 0, this.width, this.height);
+                ctx.fillStyle = "black";
+                ctx.fillText("第" + this.level + "关", this.width / 2 - 20, this.height / 2);
+                ctx.restore();
+                setTimeout(function () {
+                    _this.init(_this.level);
+                }, 5000);
+            } else {
+                alert("恭喜您，通关了！！！");
+            }
+        });
+    },
     loop: function () {
         var _this = this;
         if (this.status == 'running') {
@@ -128,7 +160,7 @@ var Context = {
             if (this.loopEvent.length > 0) {
                 this.loopEvent.pop()();
             }
-            requestAnimationFrame(function () {
+            return requestAnimationFrame(function () {
                 _this.loop();
             });
         }

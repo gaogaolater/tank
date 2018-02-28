@@ -7,8 +7,8 @@
 		dom: null,
 		itemSize: [16, 16],//每个子项大小
 		itemCount: [26, 26],//地图包含的子项
-		enemyCount: 20,
-		maxAppearEnemy: 5,
+		enemyCount: 3,
+		maxAppearEnemy: 2,
 		//敌军老家 x轴的值
 		enemyHome: [
 			[2, 0],
@@ -29,6 +29,7 @@
 				this.ctx = canvas.ctx;
 				this.dom = canvas.dom;
 			}
+			this.ctx.clearRect(0, 0, this.w, this.h);
 			this.update();
 		},
 		//击中地图

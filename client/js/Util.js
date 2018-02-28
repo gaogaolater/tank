@@ -20,6 +20,6 @@ var Util = {
             }
         }
         return false;
-    }
+    },
     
 }
