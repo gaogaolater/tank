@@ -29,7 +29,8 @@
 			ctx.clearRect(0, 0, this.w, this.h);
 			ctx.fillRect(0, 0, this.w, this.h);
 			ctx.fillStyle = "black";
-			ctx.fillText("第" + this.currentLevel + "关", this.w / 2 - 20, this.h / 2);
+			ctx.font = "24px 微软雅黑";
+			ctx.fillText("第" + this.currentLevel + "关", this.w / 2 - 30, this.h / 2);
 			ctx.restore();
 			Sound.start.play();
 			this.currentMap = eval('map' + this.currentLevel);
