@@ -35,7 +35,6 @@
 		hitMap: function (x, y) {
 			if (this.currentMap[y][x] == 1) {
 				this.currentMap[y][x] = 0;
-				console.log('击中', x, y);
 				var w = this.itemSize[0], h = this.itemSize[1];
 				this.ctx.fillRect(x * w, y * h, w, h);
 			}
@@ -58,7 +57,6 @@
 			var offsetX = x * w;
 			var offsetY = y * h;
 			var ctx = this.ctx;
-			console.log(type);
 			if (type == 1) {
 				ctx.drawImage(Resource.img, 0, 96, 16, 16, offsetX, offsetY, w, h);
 			} else if (type == 2) {

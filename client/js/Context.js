@@ -92,7 +92,6 @@ var Context = {
                     mainTank.setDirection(command);
                     var nextPosition = mainTank.getNextPosition();
                     var collision = this.checkWallCollision(nextPosition);
-                    console.log(collision);
                     if (collision.type == CollisionType.no) {
                         this.mainTank.move(command);
                     }
@@ -139,9 +138,7 @@ var Context = {
         document.onkeydown = function (event) {
             //上38 下40 左37 右39 空格32
             var keyCode = event.keyCode;
-            console.log('keyCode', keyCode);
             if (Keys.isValidate(keyCode)) {
-                console.log(keyCode);
                 _this.commands.addIfNotExist(keyCode);
             }
         }
