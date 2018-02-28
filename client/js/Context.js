@@ -7,17 +7,43 @@ var Context = {
         this.level = level;
         this.loopEvent = [];
         this.lastEnumyCount = Level.maxEnemy;
-        Level.init(level);
         this.enemy = [];
         if (!this.ctx) {
             this.ctx = Util.createCanvas(this.width, this.height, true).ctx;
         }
+        Level.init(level);
         var mainHome = Level.mainHome[0];
         this.mainTank = new Tank(mainHome[0], mainHome[1]);
         this.initKeyEvent();
-        this.status = "running";
-        this.loopId = this.loop();
         this.remainEnemy = Level.enemyCount;
+        var _this = this;
+        this.pause();
+        setTimeout(function () {
+            _this.resume();
+            _this.loop();
+        }, 2000);
+    },
+    loop: function () {
+        var _this = this;
+        if (this.status == 'running') {
+            //注意画图顺序
+            this.ctx.clearRect(0, 0, this.width, this.height);
+            this.ctx.drawImage(Level.dom, 0, 0, this.width, this.height);
+            //业务处理
+            this.excuteCommand();
+            this.addEnemy();
+            this.bulletCollision();
+            //更新视图
+            this.mainTank.update();
+            this.enemyAI();
+            if (this.loopEvent.length > 0) {
+                this.loopEvent.pop()();
+            }
+            requestAnimationFrame(this.loop.bind(this));
+        }
+    },
+    resume: function () {
+        this.status = "running";
     },
     addEnemy: function () {
         //添加敌人
@@ -80,7 +106,6 @@ var Context = {
     gameOver: function () {
         this.pause(function () {
             var _this = this;
-            cancelAnimationFrame(this.loopId);
             if (confirm("你被击中了，要重新来么？")) {
                 _this.init();
             }
@@ -123,50 +148,21 @@ var Context = {
     },
     nextLevel: function () {
         var _this = this;
-        cancelAnimationFrame(this.loopId);
-        this.pause(function () {
-            if (this.level < 21) {
-                //下一关卡
-                ++_this.level
-                var ctx = this.ctx;
-                ctx.save();
-                ctx.fillStyle = "gray";
-                ctx.clearRect(0, 0, this.width, this.height);
-                ctx.fillRect(0, 0, this.width, this.height);
-                ctx.fillStyle = "black";
-                ctx.fillText("第" + this.level + "关", this.width / 2 - 20, this.height / 2);
-                ctx.restore();
-                setTimeout(function () {
-                    _this.init(_this.level);
-                }, 5000);
-            } else {
-                alert("恭喜您，通关了！！！");
-            }
-        });
-    },
-    loop: function () {
-        var _this = this;
-        if (this.status == 'running') {
-            //注意画图顺序
-            this.ctx.clearRect(0, 0, this.width, this.height);
-            this.ctx.drawImage(Level.dom, 0, 0, this.width, this.height);
-            //业务处理
-            this.excuteCommand();
-            this.addEnemy();
-            this.bulletCollision();
-            //更新视图
-            this.mainTank.update();
-            this.enemyAI();
-            if (this.loopEvent.length > 0) {
-                this.loopEvent.pop()();
-            }
-            return requestAnimationFrame(function () {
-                _this.loop();
-            });
+        if (this.level < 21) {
+            //下一关卡
+            ++_this.level
+            var ctx = this.ctx;
+            setTimeout(function () {
+                _this.init(_this.level);
+            }, 2000);
+        } else {
+            alert("恭喜您，通关了！！！");
         }
     },
+
     initKeyEvent: function () {
         var _this = this;
+        document.onkeydown = null;
         document.onkeydown = function (event) {
             //上38 下40 左37 右39 空格32
             var keyCode = event.keyCode;
@@ -174,6 +170,7 @@ var Context = {
                 _this.commands.addIfNotExist(keyCode);
             }
         }
+        document.onkeyup = null;
         document.onkeyup = function (event) {
             var keyCode = event.keyCode;
             _this.commands.remove(keyCode);

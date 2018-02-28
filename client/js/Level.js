@@ -23,6 +23,15 @@
 			this.w = this.itemSize[0] * this.itemCount[0];
 			this.h = this.itemSize[1] * this.itemCount[1];
 			this.currentLevel = (level || 1);
+			var ctx = Context.ctx;
+			ctx.save();
+			ctx.fillStyle = "gray";
+			ctx.clearRect(0, 0, this.w, this.h);
+			ctx.fillRect(0, 0, this.w, this.h);
+			ctx.fillStyle = "black";
+			ctx.fillText("第" + this.currentLevel + "关", this.w / 2 - 20, this.h / 2);
+			ctx.restore();
+			Sound.start.play();
 			this.currentMap = eval('map' + this.currentLevel);
 			if (this.ctx == null) {
 				var canvas = Util.createCanvas(this.w, this.h, false);

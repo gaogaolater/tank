@@ -16,12 +16,20 @@ function Tank(x, y) {
 
 Tank.prototype = new Mover();
 
+Tank.prototype.move = function () {
+    var next = this.getNextPosition();
+    this.x = next.x;
+    this.y = next.y;
+    Sound.move.playOnce();
+}
+
 Tank.prototype.fire = function () {
     this.bullets.push(new Bullet(this));
+    Sound.attack.play();
 }
 
 Tank.prototype.destory = function () {
-
+    Sound.playerDestory.play();
 }
 
 //重型坦克
@@ -48,6 +56,7 @@ TankWeight.prototype = new Tank();
 TankWeight.prototype.destroy = function () {
     clearInterval(this.timerFire);
     clearInterval(this.timerDirection);
+    Sound.tankDestory.play();
 }
 
 TankWeight.prototype.AI = function () {

@@ -5,10 +5,10 @@ var Game = {
         });
     },
     pause: function () {
-        
+        Context.pause();
     },
-    reset: function () {
-
+    resume: function () {
+        Context.resume();
     },
     debug: false
 }
