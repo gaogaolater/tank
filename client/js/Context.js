@@ -62,7 +62,7 @@ var Context = {
                 enemys.forEach(function (enemy) {
                     if (Util.checkCollision(enemy, bullet)) {
                         enemy.destroy();
-                        _this.remove(enemy);
+                        _this.enemy.remove(enemy);
                         //减掉敌军坦克数量，判断是否最后一个
                         bullet.destroy();
                     }
@@ -70,12 +70,15 @@ var Context = {
             }
         })
         //敌军子弹碰撞
-        if (this.enemy.length > 0 && this.enemy.bullets) {
-            this.enemy.bullets.forEach(function (bullet) {
-                _this.bulletWallCollision(bullet);
-                if (Util.checkCollision(_this.mainTank, bullet)) {
-                    alert('你被击中了');
-                }
+        if (enemys.length > 0) {
+            enemys.forEach(function (enemy) {
+                enemy.bullets.forEach(function (bullet) {
+                    _this.bulletWallCollision(bullet);
+                    if (Util.checkCollision(_this.mainTank, bullet)) {
+                        alert('你被击中了');
+                        _this.init();
+                    }
+                })
             })
         }
     },
@@ -101,6 +104,15 @@ var Context = {
             }
         }
     },
+    enemyAI: function () {
+        var _this = this;
+        this.enemy.forEach(function (enemy) {
+            if (_this.checkWallCollision(enemy).type == CollisionType.no) {
+                enemy.move();
+            }
+            enemy.update();
+        });
+    },
     loop: function () {
         var _this = this;
         if (this.status == 'running') {
@@ -113,9 +125,7 @@ var Context = {
             this.bulletCollision();
             //更新视图
             this.mainTank.update();
-            this.enemy.forEach(function (enemy) {
-                enemy.update();
-            })
+            this.enemyAI();
             if (this.loopEvent.length > 0) {
                 this.loopEvent.pop()();
             }

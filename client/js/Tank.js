@@ -38,41 +38,41 @@ function TankWeight(x, y) {
         [Keys.left]: [66, 66],
         [Keys.right]: [98, 66]
     };
+    this.timerFire = null;
+    this.timerDirection = null;
     this.AI();
 }
 
 TankWeight.prototype = new Tank();
 
-TankWeight.prototype.destory = function () {
-
+TankWeight.prototype.destroy = function () {
+    clearInterval(this.timerFire);
+    clearInterval(this.timerDirection);
 }
 
 TankWeight.prototype.AI = function () {
     var _this = this;
-    // this.timer = setInterval(function () {
-    //     var random = parseInt(Math.random() * 10) % 5;
-    //     switch (random) {
-    //         case 0:
-    //             _this.setDirection(Keys.up);
-    //             _this.move();
-    //             break;
-    //         case 1:
-    //             _this.setDirection(Keys.down);
-    //             _this.move();
-    //             break;
-    //         case 2:
-    //             _this.setDirection(Keys.left);
-    //             _this.move();
-    //             break;
-    //         case 3:
-    //             _this.setDirection(Keys.right);
-    //             _this.move();
-    //             break;
-    //         default:
-    //             _this.fire();
-    //             break;
-    //     }
-    // }, 20);
+    this.timerDirection = setInterval(function () {
+        var direction = null;
+        switch (parseInt(Math.random() * 10) % 4) {
+            case 0:
+                direction = Keys.up;
+                break;
+            case 1:
+                direction = Keys.down;
+                break;
+            case 2:
+                direction = Keys.left;
+                break;
+            default:
+                direction = Keys.right;
+                break;
+        }
+        _this.setDirection(direction);
+    }, 3000);
+    this.timerFire = setInterval(function () {
+        _this.fire();
+    }, 4000);
 }
 
 //轻型坦克
