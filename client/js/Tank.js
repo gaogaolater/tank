@@ -61,6 +61,24 @@ TankWeight.prototype.destroy = function () {
 
 TankWeight.prototype.AI = function () {
     var _this = this;
+    /*
+    AI简单版本
+    1、移动到同一个y轴 2、移动到同一个x轴 3、打
+    AI复杂版本 找最优路径 打
+    1、递归找四个方向找最短路径 如果前面的路被堵死 回到上一个路  优先考虑空白走法
+    1、
+    */
+    // var maintank = Context.mainTank;
+    // var xOffset = this.x - maintank.x;
+    // var yOffset = this.y - maintank.y;
+    // var direction = null;
+    // if (Math.abs(xOffset) > 5) {
+    //     direction = xOffset > 0 ? Keys.left : Keys.right;
+    // } else if (Math.abs(yOffset) > 5) {
+    //     direction = yOffset > 0 ? Keys.up : Keys.down;
+    // }
+    // //是否碰撞
+    
     this.timerDirection = setInterval(function () {
         var direction = null;
         switch (parseInt(Math.random() * 10) % 4) {

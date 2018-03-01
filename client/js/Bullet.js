@@ -46,6 +46,7 @@ Bullet.prototype._fixBombPosition = function () {
     switch (this.direction) {
         case Keys.up:
             this.x = this.tank.x;
+            this.y -= offset;
             break;
         case Keys.down:
             this.x = this.tank.x;
@@ -53,6 +54,7 @@ Bullet.prototype._fixBombPosition = function () {
             break;
         case Keys.left:
             this.y = this.tank.y
+            this.x -= offset;
             break;
         default:
             this.x -= offset;
