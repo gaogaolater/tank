@@ -2,7 +2,7 @@ var Context = {
     width: 416,
     height: 416,
     init: function (level) {
-        level = (level || 1);
+        level = (level || 3);
         this.commands = [];
         this.level = level;
         this.loopEvent = [];
@@ -32,10 +32,10 @@ var Context = {
             //业务处理
             this.excuteCommand();
             this.addEnemy();
+            this.enemyAI();
             this.bulletCollision();
             //更新视图
             this.mainTank.update();
-            this.enemyAI();
             if (this.loopEvent.length > 0) {
                 this.loopEvent.pop()();
             }
@@ -45,13 +45,33 @@ var Context = {
     resume: function () {
         this.status = "running";
     },
+    enemyAI: function () {
+        if (this.enemy.length > 0) {
+            this.enemy.forEach(function (enemy) {
+                enemy.AI();
+            });
+        }
+    },
     addEnemy: function () {
+        var _this = this;
         //添加敌人
         if (this.remainEnemy > 0 && this.enemy.length < Level.maxAppearEnemy) {
             this.remainEnemy--;
             //随机一个老家出现
-            var home = Level.enemyHome[parseInt(Math.random() * 10) % Level.enemyHome.length];
-            this.enemy.push(new TankWeight(home[0], home[1]));
+            if (this.enemy.length == 0) {
+                Level.enemyHome.forEach(function (home) {
+                    _this.enemy.push(new TankWeight(home[0], home[1]));
+                });
+            } else {
+                if (!this.lastAddTime) {
+                    this.lastAddTime = +new Date;
+                } else if (new Date().getTime() - this.lastAddTime > 4000) {
+                    //随机位置出现
+                    var home = Level.enemyHome[parseInt(Math.random() * 10) % Level.enemyHome.length];
+                    this.enemy.push(new TankWeight(home[0], home[1]));
+                    this.lastAddTime = +new Date;
+                }
+            }
         }
     },
     removeEnemy: function (enemy) {
@@ -64,13 +84,14 @@ var Context = {
     //判断是否击中地图对象或超出边缘
     bulletWallCollision: function (bullet) {
         var wallCollision = this.checkWallCollision(bullet);
-        if (wallCollision.type == CollisionType.no) {
+        if (wallCollision.type == MapItem.nothing || wallCollision.type == MapItem.grass 
+            || wallCollision.type == MapItem.water || wallCollision.type == MapItem.ice) {
             bullet.move();
             bullet.update();
-        } else if (wallCollision.type == CollisionType.wall) {
+        } else if (wallCollision.type == MapItem.wall) {
             Level.hitMap(wallCollision.x, wallCollision.y);
             bullet.destroy();
-        } else if (wallCollision.type == CollisionType.edge) {
+        } else if (wallCollision.type == MapItem.edge || wallCollision.type == MapItem.steel) {
             bullet.destroy();
         }
     },
@@ -121,7 +142,7 @@ var Context = {
                     mainTank.setDirection(command);
                     var nextPosition = mainTank.getNextPosition();
                     var collision = this.checkWallCollision(nextPosition);
-                    if (collision.type == CollisionType.no) {
+                    if (collision.type == MapItem.nothing || collision.type == MapItem.grass) {
                         this.mainTank.move(command);
                     }
                 } else if (Keys.isFire(command)) {
@@ -131,15 +152,6 @@ var Context = {
                 }
             }
         }
-    },
-    enemyAI: function () {
-        var _this = this;
-        this.enemy.forEach(function (enemy) {
-            if (_this.checkWallCollision(enemy).type == CollisionType.no) {
-                enemy.move();
-            }
-            enemy.update();
-        });
     },
     pause: function (callback) {
         this.status = 'pause';
@@ -182,49 +194,53 @@ var Context = {
         var x = obj.x, y = obj.y, w = obj.w, h = obj.h;
         switch (obj.direction) {
             case Keys.up:
-                if (y <= 0) return { type: CollisionType.edge };
+                if (y <= 0) return { type: MapItem.edge };
                 wallMinX = Math.floor(x / Level.itemSize[0]);
                 wallMaxX = Math.floor((x + w) / Level.itemSize[0]);
                 wallY = Math.floor(y / Level.itemSize[1]);
                 for (var i = wallMinX; i <= wallMaxX; i++) {
-                    if (Level.currentMap[wallY][i] != 0) {
-                        return { type: CollisionType.wall, x: i, y: wallY };
+                    var mapType = Level.currentMap[wallY][i];
+                    if (mapType != MapItem.nothing && mapType != MapItem.grass) {
+                        return { type: mapType, x: i, y: wallY };
                     }
                 }
-                return { type: CollisionType.no };
+                return { type: MapItem.nothing };
             case Keys.down:
-                if (y + h >= Level.h) return { type: CollisionType.edge };
+                if (y + h >= Level.h) return { type: MapItem.edge };
                 wallMinX = Math.floor(x / Level.itemSize[0]);
                 wallMaxX = Math.floor((x + w) / Level.itemSize[0]);
                 wallY = Math.floor((y + h) / Level.itemSize[1]);
                 for (var i = wallMinX; i <= wallMaxX; i++) {
-                    if (Level.currentMap[wallY][i] != 0) {
-                        return { type: CollisionType.wall, x: i, y: wallY };
+                    var mapType = Level.currentMap[wallY][i];
+                    if (mapType != MapItem.nothing && mapType != MapItem.grass) {
+                        return { type: mapType, x: i, y: wallY };
                     }
                 }
-                return { type: CollisionType.no };
+                return { type: MapItem.nothing };
             case Keys.left:
-                if (x <= 0) return { type: CollisionType.edge };
+                if (x <= 0) return { type: MapItem.edge };
                 wallMinY = Math.floor(y / Level.itemSize[1]);
                 wallMaxY = Math.floor((y + h) / Level.itemSize[1]);
                 wallX = Math.floor(x / Level.itemSize[0]);
                 for (var i = wallMinY; i <= wallMaxY; i++) {
-                    if (Level.currentMap[i][wallX] != 0) {
-                        return { type: CollisionType.wall, x: wallX, y: i };
+                    var mapType = Level.currentMap[i][wallX];
+                    if (mapType != MapItem.nothing && mapType != MapItem.grass) {
+                        return { type: mapType, x: wallX, y: i };
                     }
                 }
-                return { type: CollisionType.no };
+                return { type: MapItem.nothing };
             default:
-                if (x + w >= Level.w) return { type: CollisionType.edge };
+                if (x + w >= Level.w) return { type: MapItem.edge };
                 wallMinY = Math.floor(y / Level.itemSize[1]);
                 wallMaxY = Math.floor((y + h) / Level.itemSize[1]);
                 wallX = Math.floor((x + w) / Level.itemSize[0]);
                 for (var i = wallMinY; i <= wallMaxY; i++) {
-                    if (Level.currentMap[i][wallX] != 0) {
-                        return { type: CollisionType.wall, x: wallX, y: i };
+                    var mapType = Level.currentMap[i][wallX];
+                    if (mapType != MapItem.nothing && mapType != MapItem.grass) {
+                        return { type: mapType, x: wallX, y: i };
                     }
                 }
-                return { type: CollisionType.no };
+                return { type: MapItem.nothing };
         }
     }
 }

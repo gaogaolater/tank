@@ -1,9 +1,14 @@
-//碰撞类型
-CollisionType = {
-    edge: 1,
-    wall: 2,
-    no: 3,
-    tank: 4
+//地图类型
+//1：水泥墙 2：铁墙 3：草 4：水 5：冰 9：家
+MapItem = {
+    nothing: 0,
+    wall: 1,//：水泥墙 
+    steel: 2,//：铁墙 
+    grass: 3,//：草 
+    water: 4,//：水 
+    ice: 5,//：冰 
+    home: 9,//：家
+    edge: -1,//边缘
 }
 
 Audio.prototype.playOnce = function () {

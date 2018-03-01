@@ -7,8 +7,8 @@
 		dom: null,
 		itemSize: [16, 16],//每个子项大小
 		itemCount: [26, 26],//地图包含的子项
-		enemyCount: 3,
-		maxAppearEnemy: 2,
+		enemyCount: 5,
+		maxAppearEnemy: 3,
 		//敌军老家 x轴的值
 		enemyHome: [
 			[2, 0],
@@ -68,17 +68,18 @@
 			var offsetX = x * w;
 			var offsetY = y * h;
 			var ctx = this.ctx;
-			if (type == 1) {
+			//1：水泥墙 2：铁墙 3：草 4：水 5：冰 9：家
+			if (type == MapItem.wall) {
 				ctx.drawImage(Resource.img, 0, 96, 16, 16, offsetX, offsetY, w, h);
-			} else if (type == 2) {
+			} else if (type == MapItem.steel) {
 				ctx.drawImage(Resource.img, 16, 96, 16, 16, offsetX, offsetY, w, h);
-			} else if (type == 3) {
-				ctx.drawImage(Resource.img, 16, 96, 16, 16, offsetX, offsetY, w, h);
-			} else if (type == 4) {
+			} else if (type == MapItem.grass) {
 				ctx.drawImage(Resource.img, 32, 96, 16, 16, offsetX, offsetY, w, h);
-			} else if (type == 5) {
+			} else if (type == MapItem.water) {
 				ctx.drawImage(Resource.img, 48, 96, 16, 16, offsetX, offsetY, w, h);
-			} else if (type == 9) {
+			} else if (type == MapItem.ice) {
+				ctx.drawImage(Resource.img, 64, 96, 16, 16, offsetX, offsetY, w, h);
+			} else if (type == MapItem.home) {
 				ctx.drawImage(Resource.img, 32 * 8, 0, 32, 32, offsetX, offsetY, 32, 32);
 			}
 			if (Game.debug) {
