@@ -2,7 +2,7 @@ var Context = {
     width: 416,
     height: 416,
     init: function (level) {
-        level = (level || 3);
+        level = (level || 1);
         this.commands = [];
         this.level = level;
         this.loopEvent = [];
@@ -60,7 +60,7 @@ var Context = {
             //随机一个老家出现
             if (this.enemy.length == 0) {
                 Level.enemyHome.forEach(function (home) {
-                    _this.enemy.push(new TankWeight(home[0], home[1]));
+                    _this.enemy.push(TankPool.get().init(home[0], home[1]));
                 });
             } else {
                 if (!this.lastAddTime) {
@@ -68,7 +68,7 @@ var Context = {
                 } else if (new Date().getTime() - this.lastAddTime > 4000) {
                     //随机位置出现
                     var home = Level.enemyHome[parseInt(Math.random() * 10) % Level.enemyHome.length];
-                    this.enemy.push(new TankWeight(home[0], home[1]));
+                    this.enemy.push(TankPool.get().init(home[0], home[1]));
                     this.lastAddTime = +new Date;
                 }
             }

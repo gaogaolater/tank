@@ -5,6 +5,12 @@ var Spirit = function (x, y, w, h) {
     this.h = h;
 }
 
+Spirit.prototype.init = function (x, y) {
+    this.x = x;
+    this.y = y;
+    return this;
+}
+
 Spirit.prototype.animate = function (frames) {
     var index = 0;
     if (frames.length == 0) return;

@@ -24,7 +24,7 @@ Tank.prototype.move = function () {
 }
 
 Tank.prototype.fire = function () {
-    this.bullets.push(new Bullet(this));
+    this.bullets.push(BulletPool.get().init(this));
     Sound.attack.play();
 }
 
@@ -55,6 +55,7 @@ TankWeight.prototype = new Tank();
 TankWeight.prototype.destroy = function () {
     clearInterval(this.timerFire);
     Sound.tankDestory.play();
+    TankPool.recycle(this);
 }
 
 TankWeight.prototype.AI = function () {

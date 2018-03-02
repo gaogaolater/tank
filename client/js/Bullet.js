@@ -1,10 +1,7 @@
 function Bullet(tank) {
-    Mover.call(this, tank.x, tank.y, 5, 5, tank.direction, 4);
-    this.tank = tank;
     this.w = 5;
-    this.y = 5;
-    this.direction = tank.direction;
-    this._fixPosition();
+    this.h = 5;
+    this.speed = 4;
     this.bombFrames = [
         [320, 0, 32, 32],
         [353, 0, 32, 32],
@@ -13,6 +10,14 @@ function Bullet(tank) {
 }
 
 Bullet.prototype = new Mover();
+
+Bullet.prototype.init = function (tank) {
+    Mover.call(this, tank.x, tank.y, this.w, this.h, tank.direction, this.speed);
+    this.tank = tank;
+    this.direction = tank.direction;
+    this._fixPosition();
+    return this;
+}
 
 //修正子弹位置 和雪碧图位置
 Bullet.prototype._fixPosition = function () {
@@ -66,6 +71,7 @@ Bullet.prototype._fixBombPosition = function () {
 Bullet.prototype.destroy = function () {
     var bullets = this.tank.bullets.remove(this);
     this.bomb();
+    BulletPool.recycle(this);
 }
 
 Bullet.prototype.bomb = function () {
